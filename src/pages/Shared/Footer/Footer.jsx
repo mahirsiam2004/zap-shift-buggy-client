@@ -1,12 +1,15 @@
 import React from "react";
 import { Logo } from "../../../components/logo/logo";
+import { NavLink } from "react-router";
 
 const Footer = () => {
   return (
     <div>
       <footer className="footer footer-horizontal footer-center   p-10">
         <aside>
-        <Logo></Logo>
+          <NavLink to={'/'}>
+            <Logo></Logo>
+          </NavLink>
           <p className="font-bold">
             ACME Industries Ltd.
             <br />

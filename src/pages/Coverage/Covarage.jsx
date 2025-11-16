@@ -1,18 +1,71 @@
-import React from "react";
+import React, { useRef } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import 'leaflet/dist/leaflet.css';
+import "leaflet/dist/leaflet.css";
 import { useLoaderData } from "react-router";
+
 const Covarage = () => {
-  const position = [23.6850, 90.3563];
-  const serviceData=useLoaderData();
-  console.log(serviceData)
+  const mapRef = useRef(null);
+  const position = [23.685, 90.3563];
+  const serviceData = useLoaderData();
+  console.log(serviceData);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+
+    const location = e.target.location.value.trim();
+    if (!location) return;
+
+    const district = serviceData.find((c) =>
+      c.district.toLowerCase().includes(location.toLowerCase())
+    );
+
+    if (district) {
+      const coord = [district.latitude, district.longitude];
+      console.log("Found district:", district.district);
+      console.log("Coordinates:", coord);
+
+      if (mapRef.current) {
+        mapRef.current.flyTo(coord, 14); // zoom 14 on that district
+      }
+    } else {
+      console.log("No district found");
+    }
+  };
+
   return (
-    <div>
-      <h2 className="text-xl font-semibold ">
-        WE are available in 64 districts
+    <div className="mt-5">
+      <h2 className="text-xl font-semibold">
+        We are available in 64 districts
       </h2>
 
-      <div></div>
+      <div className="my-5">
+        <form onSubmit={handleSearch}>
+          <label className="input">
+            <svg
+              className="h-[1em] opacity-50"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+            >
+              <g
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                strokeWidth="2.5"
+                fill="none"
+                stroke="currentColor"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.3-4.3"></path>
+              </g>
+            </svg>
+            <input
+              name="location"
+              type="search"
+              className="grow"
+              placeholder="Search district"
+            />
+          </label>
+        </form>
+      </div>
 
       <div className="border w-full h-[800px]">
         <MapContainer
@@ -20,18 +73,23 @@ const Covarage = () => {
           zoom={8}
           scrollWheelZoom={false}
           className="h-[800px]"
+        ref={mapRef}
         >
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            attribution="&copy; OpenStreetMap contributors"
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
           {serviceData.map((center) => (
-            <Marker position={[center.latitude,center.longitude]}>
+            <Marker
+              key={center.id || center.district}
+              position={[center.latitude, center.longitude]}
+            >
               <Popup>
-                <strong>{center.district} <br />
-                      service Area :{center.covered_area.join(', ')}
-                     </strong>
+                <strong>
+                  {center.district} <br />
+                  Service Area: {center.covered_area.join(", ")}
+                </strong>
               </Popup>
             </Marker>
           ))}
