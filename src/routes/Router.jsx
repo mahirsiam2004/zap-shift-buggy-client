@@ -4,7 +4,9 @@ import Home from "../pages/Home/Home/Home";
 import Covarage from "../pages/Coverage/Covarage";
 import AuthLayout from "../layouts/AuthLayout";
 import Login from "../pages/auth/login/Login";
-import Register from "../pages/auth/login/register/Register";
+import Register from "../pages/auth/register/Register";
+
+
 
 export const Router=createBrowserRouter([
     {
