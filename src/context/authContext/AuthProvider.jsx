@@ -6,6 +6,7 @@ import {
   signInWithPopup,
   onAuthStateChanged,
   signOut,
+  updateProfile,
 } from "firebase/auth";
 import { auth } from "../../firebase/firebase.init";
 import { useState, useEffect } from "react";
@@ -37,6 +38,12 @@ const logOut=()=>{
   return signOut(auth);
 }
 
+
+const updateUserProfile=(profile)=>{
+  return updateProfile(auth.currentUser,profile)
+}
+
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -53,6 +60,7 @@ const logOut=()=>{
     signInUser,
     signInGoogle,
     logOut,
+    updateUserProfile,
   };
 
   return (

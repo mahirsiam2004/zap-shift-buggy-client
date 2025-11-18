@@ -26,6 +26,9 @@ const handlelogOut=()=>{
       <li>
         <NavLink to={'/covarage'}>Covarage</NavLink>
       </li>
+      <li>
+        <NavLink to={'/sendParcel'}>Send Parcel</NavLink>
+      </li>
     </>
   );
   return (
@@ -75,9 +78,11 @@ const handlelogOut=()=>{
             </Link>
           )}
 
-          <Link to={"/beARider"} className=" mx-4 text-black btn btn-primary">
-            Be a Rider
-          </Link>
+          {user && (
+            <Link to={"/rider"} className=" mx-4 text-black btn btn-primary">
+              Be a Rider
+            </Link>
+          )}
         </div>
       </div>
     </div>
