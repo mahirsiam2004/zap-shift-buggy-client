@@ -1,6 +1,9 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useLoaderData } from "react-router";
+import Swal from "sweetalert2";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import useAuth from "../../hooks/useAuth";
 
 
 const SendParcel = () => {
@@ -10,6 +13,10 @@ const SendParcel = () => {
     watch,
     formState: { errors },
   } = useForm();
+
+const {user}=useAuth();
+const axiosSecure=useAxiosSecure();
+
 
   const serviceCEnters = useLoaderData();
 
@@ -31,7 +38,61 @@ const SendParcel = () => {
     console.log(data);
     const sameDistrict = data.senderDistrict === data.ReceiverDistrict;
     console.log(sameDistrict)
+
+    let cost=0;
+    const parcelWeight = parseFloat(data.parcelWeight);
+    const isDocument = data.parcelType==='document';
+    if(isDocument){
+      cost=sameDistrict ? 60 : 80;
+    }
+    else {
+      if(parcelWeight<3){
+        cost = sameDistrict ? 110 : 150;
+      }
+      else {
+        const minCharge=sameDistrict ? 110 : 150;
+        const extraWeight=parcelWeight-3;
+        const extraCharge =sameDistrict ? extraWeight *40 : extraWeight*40 +40;
+        cost =minCharge+extraCharge
+      }
+    }
+
+    // console.log(cost);
+
+
+
+
+    Swal.fire({
+      title: "Agree with the cost",
+      text: `your cost is ${cost}`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes",
+    }).then((result) => {
+      if (result.isConfirmed) {
+
+        axiosSecure.post('/parcels',data)
+        .then(res=>{
+          console.log('after saving parcel',res.data)
+          
+        })
+  
+
+        Swal.fire({
+          title: "Confirmed",
+          text: "Your Parcel is Now Confirmed",
+          icon: "success",
+        });
+      }
+    });
+
   };
+
+
+
+
 
   return (
     <div>
@@ -76,7 +137,7 @@ const SendParcel = () => {
             <label className="label">Parcel Weight</label>
             <input
               {...register("parcelWeight")}
-              type="text"
+              type="number"
               className="input w-full"
               placeholder="Parcel Weight"
             />
@@ -90,7 +151,7 @@ const SendParcel = () => {
             <h4 className="text-2xl font-semibold text-left">Sender Details</h4>
 
             <label className="label">Sender Name</label>
-            <input
+            <input defaultValue={user?.displayName}
               {...register("senderName")}
               type="text"
               className="input w-full"
@@ -98,7 +159,7 @@ const SendParcel = () => {
             />
 
             <label className="label">Sender email</label>
-            <input
+            <input defaultValue={user?.email}
               {...register("senderEmail")}
               type="email"
               className="input w-full"
@@ -158,7 +219,7 @@ const SendParcel = () => {
             <label className="label">Sender Phone Number</label>
             <input
               {...register("senderNumber")}
-              type="text"
+              type="number"
               className="input w-full"
               placeholder="Sender Number"
             />
@@ -239,7 +300,7 @@ const SendParcel = () => {
             <label className="label">Receiver Phone Number</label>
             <input
               {...register("ReceiverNumber")}
-              type="text"
+              type="number"
               className="input w-full"
               placeholder="Receiver Number"
             />
